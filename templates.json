@@ -1,0 +1,11 @@
+[
+    {
+        "template": "csharp-httprequest",
+        "platform": "x86_64",
+        "language": "C#",
+        "source": "cfmayer",
+        "description": "C# HTTP template for Ubuntu linux",
+        "repo": "https://github.com/cfmayer/openfaas-csharp-httprequest-template",
+        "official": "false"
+    }
+]

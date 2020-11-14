@@ -1,13 +1,10 @@
-FROM alpine:3.8 as watchdog
+FROM openfaas/of-watchdog:0.7.7 as watchdog
+FROM amd64/ubuntu:20.04 
 
-RUN apk --no-cache add curl \
-    && echo "Pulling watchdog binary from Github." \
-    && curl -sSL https://github.com/openfaas-incubator/of-watchdog/releases/download/0.5.1/of-watchdog > /usr/bin/fwatchdog \
-    && chmod +x /usr/bin/fwatchdog \
-    && cp /usr/bin/fwatchdog /home/app \
-    && apk del curl --no-cache
+COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
+RUN chmod +x /usr/bin/fwatchdog 
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 as builder
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0-focal-amd64 as builder
 
 # Supress collection of data.
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
@@ -16,7 +13,7 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
 
 RUN mkdir -p /home/app/function
 WORKDIR /home/app/function
-COPY ./function/Function.csproj  .
+COPY ./function/function.csproj  .
 
 WORKDIR /home/app/src/
 COPY ./root.csproj  .
@@ -26,7 +23,7 @@ COPY .  .
 
 RUN dotnet publish -c release -o published
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-focal-amd64
 
 COPY --from=watchdog /usr/bin/fwatchdog  /usr/bin/
 
