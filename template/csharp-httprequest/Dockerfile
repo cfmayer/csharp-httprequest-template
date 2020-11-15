@@ -4,7 +4,7 @@ FROM amd64/ubuntu:20.04
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 RUN chmod +x /usr/bin/fwatchdog 
 
-FROM mcr.microsoft.com/dotnet/core/sdk:5.0-focal-amd64 as builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-amd64 as builder
 
 # Supress collection of data.
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
@@ -23,7 +23,7 @@ COPY .  .
 
 RUN dotnet publish -c release -o published
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-focal-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal-amd64
 
 COPY --from=watchdog /usr/bin/fwatchdog  /usr/bin/
 
