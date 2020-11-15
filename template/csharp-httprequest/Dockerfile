@@ -1,10 +1,10 @@
 FROM openfaas/of-watchdog:0.8.1-x86_64 as watchdog
-FROM amd64/ubuntu:20.04 
+#FROM amd64/ubuntu:20.04 
+
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-amd64 as build
 
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 RUN chmod +x /usr/bin/fwatchdog 
-
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-amd64 as build
 
 # Supress collection of data.
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
