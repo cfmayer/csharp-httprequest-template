@@ -1,10 +1,10 @@
-FROM openfaas/of-watchdog:0.7.7 as watchdog
+FROM openfaas/of-watchdog:0.8.1-x86_64 as watchdog
 FROM amd64/ubuntu:20.04 
 
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 RUN chmod +x /usr/bin/fwatchdog 
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-amd64 as builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-amd64 as build
 
 # Supress collection of data.
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
@@ -25,14 +25,14 @@ RUN dotnet publish -c release -o published
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal-amd64
 
-COPY --from=watchdog /usr/bin/fwatchdog  /usr/bin/
+COPY --from=build /usr/bin/fwatchdog .
 
 # Create a non-root user
 RUN addgroup --system app \
     && adduser --system --ingroup app app
 
 WORKDIR /home/app/
-COPY --from=builder /home/app/src/published .
+COPY --from=build /home/app/src/published .
 RUN chown app:app -R /home/app
 
 USER app
